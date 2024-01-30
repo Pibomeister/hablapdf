@@ -1,4 +1,5 @@
 import { type ClassValue, clsx } from 'clsx';
+import { Metadata } from 'next';
 import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
@@ -13,4 +14,49 @@ export function absoluteUrl(path: string) {
     return `https://${process.env.VERCEL_URL}${path}`;
   }
   return `http://localhost:${process.env.PORT ?? 3000}${path}`;
+}
+
+export function constructMetadata({
+  title = 'HablaPDF | Habla con tus PDFs',
+  description = 'HablaPDF es una herramienta que te permite hablar con tus PDFs. Sube un PDF y comienza tus preguntas!',
+  image = '/thumbail.png',
+  icons = '/favicon.ico',
+  noIndex = false,
+}: {
+  title?: string;
+  description?: string;
+  image?: string;
+  icons?: string;
+  noIndex?: boolean;
+} = {}): Metadata {
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [
+        {
+          url: image,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [image],
+    },
+    icons,
+    metadataBase: new URL(`https://hablapdf-beta.vercel.app`),
+    ...(noIndex && {
+      robots: {
+        index: false,
+        follow: false,
+      },
+    }),
+  };
 }

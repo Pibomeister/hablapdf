@@ -11,6 +11,7 @@ import MaxWidthWrapper from './max-width-wrapper';
 import { buttonVariants } from './ui/button';
 import { ArrowRight } from 'lucide-react';
 import UserAccountNav from './user-account-nav';
+import MobileNav from './mobile-nav';
 
 const Navbar = async () => {
   const { getUser } = getKindeServerSession();
@@ -22,7 +23,7 @@ const Navbar = async () => {
           <Link href="/" className="flex z-40 font-semibold">
             <span>quill.</span>
           </Link>
-          {/*todo: add mobile navbar */}
+          <MobileNav isAuth={!!user} />
           <div className="hidden items-center space-x-4 sm:flex">
             {!user ? (
               <>

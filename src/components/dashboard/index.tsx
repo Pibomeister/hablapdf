@@ -7,14 +7,19 @@ import { trpc } from '@/app/_trpc/client';
 import UploadButton from './upload-button';
 import FileList from './file-list';
 import EmptyFiles from './empty-files';
+import { getUserSubscriptionPlan } from '../../lib/stripe';
 
-const Dashboard = () => {
+interface DashboardProps {
+  subscriptionPlan: Awaited<ReturnType<typeof getUserSubscriptionPlan>>;
+}
+
+const Dashboard = ({ subscriptionPlan }: DashboardProps) => {
   const { data: files, isLoading } = trpc.getUserFiles.useQuery();
   return (
     <main className="mx-auto max-w-7xl md:p-10">
       <div className="flex-mt-8 flex flex-col items-start justify-between gap-4 border-b border-gray-200 p-4 lg:p-0 sm:flex-row sm:items-center sm:gap-0">
         <h1 className="mb-3 font-bold text-5xl text-gray-900">My Files</h1>
-        <UploadButton />
+        <UploadButton isSubscribed={subscriptionPlan.isSubscribed} />
       </div>
       {files && files.length !== 0 ? (
         <FileList files={files} />
