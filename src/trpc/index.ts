@@ -63,28 +63,35 @@ export const appRouter = router({
       return { url: stripeSession.url };
     }
     const isProd = process.env.NODE_ENV === 'production';
-    const stripeSession = await stripe.checkout.sessions.create({
-      success_url: billingUrl,
-      cancel_url: billingUrl,
-      payment_method_types: [
-        'card',
-        // 'paypal',
-        // 'cashapp'
-      ],
-      mode: 'subscription',
-      billing_address_collection: 'auto',
-      line_items: [
-        {
-          price: PLANS.find((plan) => plan.name === 'Pro')?.price.priceIds[
-            isProd ? 'production' : 'test'
-          ],
-          quantity: 1,
+    let stripeSession: Stripe.Response<Stripe.Checkout.Session> | undefined;
+    try {
+      stripeSession = await stripe.checkout.sessions.create({
+        success_url: billingUrl,
+        cancel_url: billingUrl,
+        payment_method_types: [
+          'card',
+          // 'paypal',
+          // 'cashapp'
+        ],
+        mode: 'subscription',
+        billing_address_collection: 'auto',
+        line_items: [
+          {
+            price: PLANS.find((plan) => plan.name === 'Pro')?.price.priceIds[
+              isProd ? 'production' : 'test'
+            ],
+            quantity: 1,
+          },
+        ],
+        metadata: {
+          userId,
         },
-      ],
-      metadata: {
-        userId,
-      },
-    });
+      });
+    } catch (e) {
+      console.log('Stripe error!');
+      console.log(e);
+      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+    }
     console.log(stripeSession);
     return { url: stripeSession?.url };
   }),
