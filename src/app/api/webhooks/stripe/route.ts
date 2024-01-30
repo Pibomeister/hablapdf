@@ -21,7 +21,6 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   }
-  console.log('Stripe event:', event.type);
 
   const session = event.data.object as Stripe.Checkout.Session;
 
@@ -32,51 +31,39 @@ export async function POST(request: Request) {
   }
 
   if (event.type === 'checkout.session.completed') {
+    console.log('checkout.session.completed received');
     const subscription = await stripe.subscriptions.retrieve(
       session.subscription as string
     );
+    console.log(subscription);
+
     await db.user.update({
       where: {
-        id: session.metadata.userId!,
+        id: session.metadata.userId,
       },
       data: {
-        stripeCustomerId: session.customer as string,
-        stripeSubscriptionId: session.subscription as string,
-        stripePriceId: session.line_items?.data[0].price?.id as string,
-        stripeCurrentPeriodEnd: new Date(
-          subscription.current_period_end * 1000
-        ),
-      },
-    });
-  }
-  if (event.type === 'customer.subscription.created') {
-    // Retrieve the subscription details from Stripe.
-    const subscription = await stripe.subscriptions.retrieve(
-      session.subscription as string
-    );
-    await db.user.update({
-      where: {
         stripeSubscriptionId: subscription.id,
-      },
-      data: {
-        stripePriceId: subscription.items?.data[0].price?.id as string,
+        stripeCustomerId: subscription.customer as string,
+        stripePriceId: subscription.items.data[0]?.price.id,
         stripeCurrentPeriodEnd: new Date(
           subscription.current_period_end * 1000
         ),
       },
     });
   }
+
   if (event.type === 'invoice.payment_succeeded') {
     // Retrieve the subscription details from Stripe.
     const subscription = await stripe.subscriptions.retrieve(
       session.subscription as string
     );
+
     await db.user.update({
       where: {
         stripeSubscriptionId: subscription.id,
       },
       data: {
-        stripePriceId: subscription.items?.data[0].price?.id as string,
+        stripePriceId: subscription.items.data[0]?.price.id,
         stripeCurrentPeriodEnd: new Date(
           subscription.current_period_end * 1000
         ),
