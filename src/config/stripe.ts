@@ -21,7 +21,8 @@ export const PLANS = [
       amount: 14,
       priceIds: {
         test: 'price_1OdfkXGuN8ilXxzG2mbyQ0tz',
-        production: 'price_1OdfoEGuN8ilXxzGG4J8BNSI',
+        // production: 'price_1OdfoEGuN8ilXxzGG4J8BNSI', // TODO: uncomment once we have staging set up
+        production: 'price_1OdfkXGuN8ilXxzG2mbyQ0tz',
       },
     },
   },
