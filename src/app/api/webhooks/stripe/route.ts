@@ -21,6 +21,7 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   }
+  console.log('Stripe event:', event.type);
 
   const session = event.data.object as Stripe.Checkout.Session;
 
@@ -48,7 +49,23 @@ export async function POST(request: Request) {
       },
     });
   }
-
+  if (event.type === 'customer.subscription.created') {
+    // Retrieve the subscription details from Stripe.
+    const subscription = await stripe.subscriptions.retrieve(
+      session.subscription as string
+    );
+    await db.user.update({
+      where: {
+        stripeSubscriptionId: subscription.id,
+      },
+      data: {
+        stripePriceId: subscription.items?.data[0].price?.id as string,
+        stripeCurrentPeriodEnd: new Date(
+          subscription.current_period_end * 1000
+        ),
+      },
+    });
+  }
   if (event.type === 'invoice.payment_succeeded') {
     // Retrieve the subscription details from Stripe.
     const subscription = await stripe.subscriptions.retrieve(
