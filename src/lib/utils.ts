@@ -14,3 +14,10 @@ export function absoluteUrl(path: string) {
   }
   return `http://localhost:${process.env.PORT ?? 3000}${path}`;
 }
+
+export function apiUrl(path: string) {
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}/api${path}`;
+  }
+  return `http://localhost:${process.env.PORT ?? 3000}/api${path}`;
+}
