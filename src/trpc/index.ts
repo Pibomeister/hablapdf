@@ -53,14 +53,19 @@ export const appRouter = router({
     if (!dbUser) throw new TRPCError({ code: 'UNAUTHORIZED' });
 
     const subscriptionPlan = await getUserSubscriptionPlan();
-    console.log(subscriptionPlan);
 
     if (subscriptionPlan.isSubscribed && dbUser.stripeCustomerId) {
-      const stripeSession = await stripe.billingPortal.sessions.create({
-        customer: dbUser.stripeCustomerId,
-        return_url: billingUrl,
-      });
-      return { url: stripeSession.url };
+      try {
+        const stripeSession = await stripe.billingPortal.sessions.create({
+          customer: dbUser.stripeCustomerId,
+          return_url: billingUrl,
+        });
+        return { url: stripeSession.url };
+      } catch (e) {
+        console.log('Stripe error!');
+        console.log(e);
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+      }
     }
     const isProd = process.env.NODE_ENV === 'production';
     let stripeSession: Stripe.Response<Stripe.Checkout.Session> | undefined;
