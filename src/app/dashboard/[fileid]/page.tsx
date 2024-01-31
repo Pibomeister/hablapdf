@@ -2,7 +2,7 @@ import React from 'react';
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
 import { notFound, redirect } from 'next/navigation';
 
-import { db } from '@/db';
+import db from '@/db';
 import PdfRenderer from '@/components/file-details/pdf-renderer';
 import ChatWrapper from '@/components/file-details/chat/chat-wrapper';
 

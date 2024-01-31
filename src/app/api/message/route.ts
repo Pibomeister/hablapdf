@@ -5,7 +5,7 @@ import { PineconeStore } from '@langchain/pinecone';
 import { OpenAIStream, StreamingTextResponse } from 'ai';
 
 import { sendMessageValidator } from '@/lib/validators/send-message-validator';
-import { db } from '@/db';
+import db from '@/db';
 import { pinecone } from '@/lib/pinecone';
 import { openai } from '@/lib/openai';
 
