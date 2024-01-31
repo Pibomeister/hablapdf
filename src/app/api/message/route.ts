@@ -9,6 +9,10 @@ import { db } from '@/db';
 import { pinecone } from '@/lib/pinecone';
 import { openai } from '@/lib/openai';
 
+export const config = {
+  runtime: 'edge', //This specifies the runtime environment that the middleware function will be executed in.
+};
+
 export const POST = async (req: NextRequest) => {
   const body = await req.json();
   const { getUser } = getKindeServerSession();
